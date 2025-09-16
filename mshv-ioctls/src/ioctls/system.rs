@@ -11,6 +11,8 @@ use mshv_bindings::*;
 use std::fs::File;
 use std::os::raw::c_char;
 use std::os::unix::io::{FromRawFd, RawFd};
+use std::fs::OpenOptions;
+use std::io::Write;
 use vmm_sys_util::errno;
 use vmm_sys_util::ioctl::{ioctl_with_mut_ref, ioctl_with_ref};
 
@@ -183,7 +185,7 @@ impl Mshv {
     }
 
     /// Retrieve the host partition property given a property code.
-    pub fn get_host_partition_property(&self, property_code: u32) -> Result<u64> {
+    pub fn get_host_partition_property(&self, property_code: u64) -> Result<u64> {
         let mut property = mshv_partition_property {
             property_code: property_code as u64,
             ..Default::default()
@@ -192,6 +194,12 @@ impl Mshv {
         let ret = unsafe {
             ioctl_with_mut_ref(&self.hv, MSHV_GET_HOST_PARTITION_PROPERTY(), &mut property)
         };
+        let mut tmp_file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open("/tmp/mshv.log")
+            .unwrap();
+        writeln!(tmp_file, "PPK: get property code {:?}, value {:?}", property_code, property.property_value).unwrap();
         if ret == 0 {
             Ok(property.property_value)
         } else {
