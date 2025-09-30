@@ -49,8 +49,7 @@ pub fn make_default_partition_create_arg(vm_type: VmType) -> mshv_create_partiti
         u64,
         MSHV_PT_BIT_LAPIC,
         MSHV_PT_BIT_X2APIC,
-        MSHV_PT_BIT_GPA_SUPER_PAGES,
-        MSHV_PT_BIT_CPU_AND_XSAVE_FEATURES
+        MSHV_PT_BIT_GPA_SUPER_PAGES
     );
     let mut pt_isolation: u64 = MSHV_PT_ISOLATION_NONE as u64;
 
